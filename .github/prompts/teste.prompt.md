@@ -1,0 +1,1 @@
+Diga qual a principal fala do saudosíssimo Mason's Glove, A.k.a. "O Luva de Pedreiro". Apenas a fala dele. Sem aspas. Sem dizer "a principal fala" antes. Apenas a fala.
