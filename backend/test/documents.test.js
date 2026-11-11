@@ -108,3 +108,30 @@ test('rejeita arquivos acima do limite configurado', async (t) => {
   assert.equal(response.status, 413);
   assert.equal((await response.json()).error.code, 'FILE_TOO_LARGE');
 });
+
+test('exige usuário em todos os endpoints de documentos', async (t) => {
+  const baseUrl = await startServer(t);
+  const requests = [
+    ['/upload', { method: 'POST', body: createFileForm('conteúdo') }],
+    ['/documents', {}],
+    ['/documents/inexistente/download', {}],
+  ];
+
+  for (const [endpoint, options] of requests) {
+    const response = await fetch(`${baseUrl}${endpoint}`, options);
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error.code, 'MISSING_USER_ID');
+  }
+});
+
+test('retorna 404 ao baixar um documento inexistente', async (t) => {
+  const baseUrl = await startServer(t);
+  const response = await fetch(`${baseUrl}/documents/inexistente/download`, {
+    headers: { 'X-User-Id': 'download-user' },
+  });
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(await response.json(), {
+    error: { code: 'DOCUMENT_NOT_FOUND', message: 'Documento não encontrado.' },
+  });
+});
